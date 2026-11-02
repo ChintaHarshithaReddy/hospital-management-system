@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<h2>Staff accounts</h2>
+<form method="post" class="card formgrid">
+  <label>Username<input name="username" required></label>
+  <label>Password (6+ characters)<input name="password" type="password" minlength="6" required></label>
+  <label>Role<select name="role"><option value="staff">Staff</option><option value="admin">Admin</option></select></label>
+  <div><button class="btn">Create user</button></div>
+</form>
+<div class="card tw"><table>
+  <tr><th>Username</th><th>Role</th></tr>
+  {% for u in users %}<tr><td>{{ u.username }}</td><td>{{ u.role }}</td></tr>{% endfor %}
+</table></div>
+<h3>Change my password</h3>
+<form method="post" action="{{ url_for('change_password') }}" class="card formgrid">
+  <label>Current password<input name="old_password" type="password" required></label>
+  <label>New password<input name="new_password" type="password" minlength="6" required></label>
+  <div><button class="btn">Change password</button></div>
+</form>
+{% endblock %}

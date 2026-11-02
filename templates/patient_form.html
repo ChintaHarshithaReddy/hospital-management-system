@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if patient else 'Register' }} patient{% endblock %}
+{% block content %}
+<h2>{{ 'Edit patient' if patient else 'Register patient' }}</h2>
+<form method="post" class="card formgrid">
+  <label>Full name<input name="name" required value="{{ patient.name if patient }}"></label>
+  <label>Age<input name="age" type="number" min="0" max="120" required value="{{ patient.age if patient }}"></label>
+  <label>Gender
+    <select name="gender">
+      {% for g in ['Female','Male','Other'] %}<option {{ 'selected' if patient and patient.gender == g }}>{{ g }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Blood group
+    <select name="blood_group">
+      <option value="">Unknown</option>
+      {% for b in ['A+','A-','B+','B-','AB+','AB-','O+','O-'] %}<option {{ 'selected' if patient and patient.blood_group == b }}>{{ b }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Phone<input name="phone" type="tel" required value="{{ patient.phone if patient }}"></label>
+  <label>Address<input name="address" value="{{ patient.address or '' if patient }}"></label>
+  <label class="wide">Medical notes<textarea name="notes" rows="3">{{ patient.notes or '' if patient }}</textarea></label>
+  <div class="wide"><button class="btn" type="submit">Save patient</button>
+  <a class="btn ghost" href="{{ url_for('patients') }}">Cancel</a></div>
+</form>
+{% endblock %}

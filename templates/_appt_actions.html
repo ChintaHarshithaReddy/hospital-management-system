@@ -1,0 +1,6 @@
+{% for s in ['Completed', 'Cancelled'] %}
+<form method="post" action="{{ url_for('appointment_status', aid=a.id) }}" class="inline">
+  <input type="hidden" name="status" value="{{ s }}"><button class="btn sm">{{ s[:-1] if s == 'Cancelled' else 'Complete' }}</button></form>
+{% endfor %}
+<form method="post" action="{{ url_for('appointment_delete', aid=a.id) }}" class="inline" onsubmit="return confirm('Delete this appointment?')">
+  <button class="btn sm del">Delete</button></form>

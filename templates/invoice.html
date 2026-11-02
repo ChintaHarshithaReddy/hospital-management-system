@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Invoice #{{ b.id }}{% endblock %}
+{% block content %}
+<div class="invoice card">
+  <div class="bar"><h2>Invoice #{{ b.id }}</h2><span class="badge {{ b.status }}">{{ b.status }}</span></div>
+  <p><b>Date:</b> {{ b.created_at }}</p>
+  <p><b>Billed to:</b> {{ b.patient }}<br>{{ b.phone }}<br>{{ b.address or '' }}</p>
+  <table>
+    <tr><th>Description</th><th class="r">Amount</th></tr>
+    <tr><td>{{ b.description }}</td><td class="r">₹{{ '%.2f'|format(b.amount) }}</td></tr>
+    <tr><td class="r"><b>Total</b></td><td class="r"><b>₹{{ '%.2f'|format(b.amount) }}</b></td></tr>
+  </table>
+  <p class="noprint">
+    <button class="btn" onclick="window.print()">Print invoice</button>
+    <a class="btn ghost" href="{{ url_for('billing') }}">Back to billing</a>
+  </p>
+</div>
+{% endblock %}

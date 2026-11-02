@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Doctors{% endblock %}
+{% block content %}
+<h2>Doctors</h2>
+{% if session.role == 'admin' %}
+<form method="post" class="card formgrid">
+  <label>Name<input name="name" required placeholder="Dr. Name"></label>
+  <label>Specialization<input name="specialization" required></label>
+  <label>Phone<input name="phone" type="tel"></label>
+  <div><button class="btn">Add doctor</button></div>
+</form>
+{% endif %}
+<div class="card tw">
+<table>
+  <tr><th>Name</th><th>Specialization</th><th>Phone</th><th>Upcoming appointments</th><th></th></tr>
+  {% for d in doctors %}
+  <tr><td>{{ d.name }}</td><td>{{ d.specialization }}</td><td>{{ d.phone or '-' }}</td><td>{{ d.upcoming }}</td>
+      <td>{% if session.role == 'admin' %}<form method="post" action="{{ url_for('doctor_delete', did=d.id) }}" class="inline" onsubmit="return confirm('Remove this doctor and their appointments?')"><button class="btn sm del">Remove</button></form>{% endif %}</td></tr>
+  {% endfor %}
+</table>
+</div>
+{% endblock %}

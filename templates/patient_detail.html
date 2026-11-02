@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ p.name }}{% endblock %}
+{% block content %}
+<div class="bar">
+  <h2>{{ p.name }}</h2>
+  <div>
+    <a class="btn" href="{{ url_for('patient_edit', pid=p.id) }}">Edit</a>
+    {% if session.role == 'admin' %}
+    <form method="post" action="{{ url_for('patient_delete', pid=p.id) }}" class="inline" onsubmit="return confirm('Delete this patient and all their records?')">
+      <button class="btn del">Delete</button></form>
+    {% endif %}
+  </div>
+</div>
+<div class="card info">
+  <div><span>Age</span>{{ p.age }}</div><div><span>Gender</span>{{ p.gender }}</div>
+  <div><span>Blood group</span>{{ p.blood_group or '-' }}</div><div><span>Phone</span>{{ p.phone }}</div>
+  <div><span>Address</span>{{ p.address or '-' }}</div><div><span>Registered</span>{{ p.created_at }}</div>
+  <div class="wide"><span>Medical notes</span>{{ p.notes or '-' }}</div>
+</div>
+
+<div class="card">
+  <h3>Appointments</h3>
+  <form method="post" action="{{ url_for('appointments') }}" class="formgrid">
+    <input type="hidden" name="patient_id" value="{{ p.id }}">
+    <label>Doctor<select name="doctor_id">{% for d in doctors %}<option value="{{ d.id }}">{{ d.name }} ({{ d.specialization }})</option>{% endfor %}</select></label>
+    <label>Date<input type="date" name="appt_date" required></label>
+    <label>Time<input type="time" name="appt_time" required></label>
+    <label>Reason<input name="reason"></label>
+    <div><button class="btn">Book</button></div>
+  </form>
+  {% if appts %}<div class="tw"><table>
+    <tr><th>Date</th><th>Time</th><th>Doctor</th><th>Reason</th><th>Status</th><th></th></tr>
+    {% for a in appts %}
+    <tr><td>{{ a.appt_date }}</td><td>{{ a.appt_time }}</td><td>{{ a.doctor }}</td><td>{{ a.reason or '-' }}</td>
+        <td><span class="badge {{ a.status }}">{{ a.status }}</span></td>
+        <td>{% include "_appt_actions.html" %}</td></tr>
+    {% endfor %}
+  </table></div>{% else %}<p class="muted">No appointments yet.</p>{% endif %}
+</div>
+
+<div class="card">
+  <h3>Prescriptions</h3>
+  <form method="post" action="{{ url_for('prescription_add', pid=p.id) }}" class="formgrid">
+    <label>Medicine<input name="medicine" required></label>
+    <label>Dosage<input name="dosage" placeholder="e.g. 500 mg, twice a day" required></label>
+    <label>Prescribed by<select name="doctor_id"><option value="">-</option>{% for d in doctors %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}</select></label>
+    <label>Instructions<input name="instructions"></label>
+    <div><button class="btn">Add</button></div>
+  </form>
+  {% if rx %}<div class="tw"><table>
+    <tr><th>Date</th><th>Medicine</th><th>Dosage</th><th>Instructions</th><th>Doctor</th><th></th></tr>
+    {% for r in rx %}
+    <tr><td>{{ r.created_at }}</td><td>{{ r.medicine }}</td><td>{{ r.dosage }}</td><td>{{ r.instructions or '-' }}</td><td>{{ r.doctor or '-' }}</td>
+        <td><form method="post" action="{{ url_for('prescription_delete', rid=r.id) }}" class="inline"><button class="btn sm del">Delete</button></form></td></tr>
+    {% endfor %}
+  </table></div>{% else %}<p class="muted">No prescriptions yet.</p>{% endif %}
+</div>
+
+<div class="card">
+  <h3>Bills</h3>
+  <form method="post" action="{{ url_for('billing') }}" class="formgrid">
+    <input type="hidden" name="patient_id" value="{{ p.id }}">
+    <label>Description<input name="description" required placeholder="Consultation, lab test..."></label>
+    <label>Amount (₹)<input name="amount" type="number" min="1" step="0.01" required></label>
+    <div><button class="btn">Create bill</button></div>
+  </form>
+  {% if bills %}<div class="tw"><table>
+    <tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th><th></th></tr>
+    {% for b in bills %}
+    <tr><td>{{ b.created_at }}</td><td>{{ b.description }}</td><td>₹{{ '%.2f'|format(b.amount) }}</td>
+        <td><span class="badge {{ b.status }}">{{ b.status }}</span></td>
+        <td><a class="btn sm" href="{{ url_for('invoice', bid=b.id) }}">Invoice</a></td></tr>
+    {% endfor %}
+  </table></div>{% else %}<p class="muted">No bills yet.</p>{% endif %}
+</div>
+{% endblock %}

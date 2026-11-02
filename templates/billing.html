@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Billing{% endblock %}
+{% block content %}
+<h2>Billing</h2>
+<div class="stats">
+  <div class="stat"><b>₹{{ '%.2f'|format(unpaid) }}</b><span>Unpaid</span></div>
+  <div class="stat"><b>₹{{ '%.2f'|format(paid) }}</b><span>Paid</span></div>
+</div>
+<form method="post" class="card formgrid">
+  <label>Patient<select name="patient_id" required>
+    {% for p in patients %}<option value="{{ p.id }}">{{ p.name }}</option>{% else %}<option value="" disabled selected>Register a patient first</option>{% endfor %}</select></label>
+  <label>Description<input name="description" required placeholder="Consultation, lab test, room charges..."></label>
+  <label>Amount (₹)<input name="amount" type="number" min="1" step="0.01" required></label>
+  <div><button class="btn">Create bill</button></div>
+</form>
+<div class="card tw">
+{% if bills %}
+<table>
+  <tr><th>Bill</th><th>Date</th><th>Patient</th><th>Description</th><th>Amount</th><th>Status</th><th></th></tr>
+  {% for b in bills %}
+  <tr><td>#{{ b.id }}</td><td>{{ b.created_at }}</td><td>{{ b.patient }}</td><td>{{ b.description }}</td><td>₹{{ '%.2f'|format(b.amount) }}</td>
+      <td><span class="badge {{ b.status }}">{{ b.status }}</span></td>
+      <td>
+        <a class="btn sm" href="{{ url_for('invoice', bid=b.id) }}">Invoice</a>
+        {% if b.status == 'Unpaid' %}<form method="post" action="{{ url_for('bill_pay', bid=b.id) }}" class="inline"><button class="btn sm">Mark paid</button></form>{% endif %}
+        {% if session.role == 'admin' %}<form method="post" action="{{ url_for('bill_delete', bid=b.id) }}" class="inline" onsubmit="return confirm('Delete this bill?')"><button class="btn sm del">Delete</button></form>{% endif %}
+      </td></tr>
+  {% endfor %}
+</table>
+{% else %}<p class="muted">No bills yet.</p>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Appointments{% endblock %}
+{% block content %}
+<h2>Appointments</h2>
+<form method="post" class="card formgrid">
+  <label>Patient<select name="patient_id" required>
+    {% for p in patients %}<option value="{{ p.id }}">{{ p.name }}</option>{% else %}<option value="" disabled selected>Register a patient first</option>{% endfor %}</select></label>
+  <label>Doctor<select name="doctor_id" required>{% for d in doctors %}<option value="{{ d.id }}">{{ d.name }} ({{ d.specialization }})</option>{% endfor %}</select></label>
+  <label>Date<input type="date" name="appt_date" min="{{ today }}" required></label>
+  <label>Time<input type="time" name="appt_time" required></label>
+  <label>Reason<input name="reason"></label>
+  <div><button class="btn">Book appointment</button></div>
+</form>
+<form method="get" class="inline">
+  <select name="status" onchange="this.form.submit()">
+    <option value="">All statuses</option>
+    {% for s in ['Scheduled','Completed','Cancelled'] %}<option {{ 'selected' if status == s }}>{{ s }}</option>{% endfor %}
+  </select>
+</form>
+<div class="card tw">
+{% if appts %}
+<table>
+  <tr><th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Reason</th><th>Status</th><th></th></tr>
+  {% for a in appts %}
+  <tr><td>{{ a.appt_date }}</td><td>{{ a.appt_time }}</td><td><a href="{{ url_for('patient_detail', pid=a.patient_id) }}">{{ a.patient }}</a></td>
+      <td>{{ a.doctor }}</td><td>{{ a.reason or '-' }}</td><td><span class="badge {{ a.status }}">{{ a.status }}</span></td>
+      <td>{% include "_appt_actions.html" %}</td></tr>
+  {% endfor %}
+</table>
+{% else %}<p class="muted">No appointments found.</p>{% endif %}
+</div>
+{% endblock %}

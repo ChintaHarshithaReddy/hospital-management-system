@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<div class="stats">
+  <div class="stat"><b>{{ stats.patients }}</b><span>Patients</span></div>
+  <div class="stat"><b>{{ stats.doctors }}</b><span>Doctors</span></div>
+  <div class="stat"><b>{{ stats.today }}</b><span>Appointments today</span></div>
+  <div class="stat"><b>₹{{ '%.0f'|format(stats.unpaid) }}</b><span>Unpaid bills</span></div>
+  <div class="stat"><b>₹{{ '%.0f'|format(stats.revenue) }}</b><span>Revenue collected</span></div>
+</div>
+<div class="grid2">
+  <div class="card">
+    <h3>Today's appointments</h3>
+    {% if todays %}
+    <div class="tw"><table>
+      <tr><th>Time</th><th>Patient</th><th>Doctor</th><th>Status</th></tr>
+      {% for a in todays %}
+      <tr><td>{{ a.appt_time }}</td><td>{{ a.patient }}</td><td>{{ a.doctor }}</td><td><span class="badge {{ a.status }}">{{ a.status }}</span></td></tr>
+      {% endfor %}
+    </table></div>
+    {% else %}<p class="muted">No appointments today.</p>{% endif %}
+  </div>
+  <div class="card">
+    <h3>Recently registered</h3>
+    {% for p in recent %}
+      <p><a href="{{ url_for('patient_detail', pid=p.id) }}">{{ p.name }}</a> <span class="muted">{{ p.created_at }}</span></p>
+    {% else %}<p class="muted">No patients yet.</p>{% endfor %}
+    <a class="btn sm" href="{{ url_for('patient_add') }}">Register patient</a>
+  </div>
+</div>
+{% endblock %}
